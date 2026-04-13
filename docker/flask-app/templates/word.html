@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="word-detail">
+    <img src="{{ entry.image_url }}" alt="{{ entry.word }}">
+    <div class="word-info">
+        <h1>{{ entry.word }}</h1>
+        <p class="definition">{{ entry.definition }}</p>
+        <p class="credit">{{ entry.image_credit }}</p>
+        <p class="date">Added {{ entry.created_at.strftime('%B %d, %Y') }}</p>
+        <button onclick="deleteWord('{{ entry.word }}')">Delete</button>
+    </div>
+</div>
+
+<script>
+    async function deleteWord(word) {
+        if (!confirm(`Delete "${word}" from your dictionary?`)) return;
+        const res = await fetch(`/api/words/${word}`, { method: "DELETE" });
+        if (res.ok) window.location.href = "/";
+    }
+</script>
+{% endblock %}

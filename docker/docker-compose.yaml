@@ -1,0 +1,38 @@
+services:
+  flask-app:
+    build:
+      context: ./flask-app
+      dockerfile: Dockerfile
+    container_name: visual-dictionary
+    ports:
+      - "5000:5000"
+    environment:
+      - UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY}
+    volumes:
+      - flask-data:/app/instance
+    depends_on:
+      - jenkins
+    networks:
+      - ci-cd-network
+
+  jenkins:
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-data:/var/jenkins-home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ci-cd-network
+
+volumes:
+  flask-data:
+  jenkins-data:
+
+networks:
+  ci-cd-network:
+    driver: bridge

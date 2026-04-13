@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your Visual Dictionary</h1>
+{% if words %}
+<div class="grid">
+    {% for entry in words %}
+    <a href="/words/{{ entry.word }}" class="card">
+        <img src="{{ entry.image_url }}" alt="{{ entry.word }}">
+        <div class="card-body">
+            <h2>{{ entry.word }}</h2>
+            <p>{{ entry.definition }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty">
+    <p>Your dictionary is empty. <a href="/add">Add your first word!</a></p>
+</div>
+{% endif %}
+{% endblock %}
