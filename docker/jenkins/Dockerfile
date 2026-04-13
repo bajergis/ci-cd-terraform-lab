@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN groupadd -f docker && usermod -aG docker jenkins
+
 # Install Jenkins plugins
 RUN jenkins-plugin-cli --plugins \
     git \
