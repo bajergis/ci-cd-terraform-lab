@@ -51,10 +51,23 @@ module "eks" {
 
   eks_managed_node_groups = {
     default = {
-      instance_types = ["t3.medium"]  # upgraded from small — Jenkins needs more memory
-      min_size       = 2
-      max_size       = 3
+      instance_types = ["t3.small"]  # upgraded from small — Jenkins needs more memory
+      min_size       = 1
+      max_size       = 2
       desired_size   = 2
+    }
+  }
+  access_entries = {
+    terraform_user = {
+      principal_arn = "arn:aws:iam::397845934685:user/terraform-user"
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
     }
   }
 
@@ -74,4 +87,13 @@ provider "kubernetes" {
     command     = "aws"
     args        = ["eks", "get-token", "--cluster-name", var.cluster_name, "--region", var.region]
   }
+}
+
+module "k8s" {
+  source = "./k8s"
+
+  ecr_repository_url  = aws_ecr_repository.visual_dictionary.repository_url
+  unsplash_access_key = var.unsplash_access_key
+
+  depends_on = [module.eks, kubernetes_namespace.app]
 }
