@@ -30,28 +30,30 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh """
+                sh '''
                     docker run --rm \
-                        -e UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY} \
-                        ${IMAGE_NAME}:${IMAGE_TAG} \
-                        python -m pytest tests/ -v || echo 'No tests yet'
-                """
+                        -e UNSPLASH_ACCESS_KEY=test \
+                        visual-dictionary:${BUILD_NUMBER} \
+                        python -m pytest tests/ -v || echo "No tests yet"
+                '''
             }
         }
 
         stage('Deploy') {
             steps {
                 echo 'Deploying new version...'
-                sh """
-                    docker stop visual-dictionary || true
-                    docker rm visual-dictionary || true
-                    docker run -d \
-                        --name visual-dictionary \
-                        --network docker_ci-cd-network \
-                        -p 5000:5000 \
-                        -e UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY} \
-                        ${IMAGE_NAME}:${IMAGE_TAG}
-                """
+                withCredentials([string(credentialsId: 'unsplash-api-key', variable: 'UNSPLASH_KEY')]) {
+                    sh '''
+                        docker stop visual-dictionary || true
+                        docker rm visual-dictionary || true
+                        docker run -d \
+                            --name visual-dictionary \
+                            --network docker_ci-cd-network \
+                            -p 5000:5000 \
+                            -e UNSPLASH_ACCESS_KEY=$UNSPLASH_KEY \
+                            visual-dictionary:${BUILD_NUMBER}
+                    '''
+                }
             }
         }
 
