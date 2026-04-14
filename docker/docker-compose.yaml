@@ -10,8 +10,8 @@ services:
       - UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY}
     volumes:
       - flask-data:/app/instance
-    depends_on:
-      - jenkins
+    env_file:
+      - .env
     networks:
       - ci-cd-network
 
@@ -25,7 +25,7 @@ services:
       - "50000:50000"
     user: root
     volumes:
-      - jenkins-data:/var/jenkins-home
+      - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - ci-cd-network
