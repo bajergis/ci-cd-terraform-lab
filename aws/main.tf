@@ -89,9 +89,9 @@ provider "kubernetes" {
   }
 }
 
-module "k8s" {
-  source = "./k8s"
-  ecr_repository_url  = aws_ecr_repository.visual_dictionary.repository_url
-  unsplash_access_key = var.unsplash_access_key
-  depends_on = [module.eks, kubernetes_namespace.app]
-}
+#module "k8s" {
+#  source = "./k8s"
+#  ecr_repository_url  = aws_ecr_repository.visual_dictionary.repository_url
+#  unsplash_access_key = var.unsplash_access_key
+#  depends_on = [module.eks, kubernetes_namespace.app]
+#}
