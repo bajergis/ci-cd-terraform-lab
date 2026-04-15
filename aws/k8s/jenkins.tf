@@ -47,3 +47,30 @@ resource "kubernetes_deployment" "jenkins" {
     }
   }
 }
+
+resource "kubernetes_service" "jenkins" {
+  metadata {
+    name      = "jenkins"
+    namespace = "visual-dictionary"
+  }
+
+  spec {
+    selector = {
+      app = "jenkins"
+    }
+
+    port {
+      name        = "http"
+      port        = 8080
+      target_port = 8080
+    }
+
+    port {
+      name        = "jnlp"
+      port        = 50000
+      target_port = 50000
+    }
+
+    type = "LoadBalancer"
+  }
+}
