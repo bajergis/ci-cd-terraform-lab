@@ -253,6 +253,8 @@ Then add them in Jenkins under Manage Jenkins -> Credentials -> System -> Global
 | `aws-secret-access-key` | Secret text | AWS secret key |
 | `unsplash-api-key` | Secret text | Unsplash API key |
  
+Then create a new Job in Jenkins where you add your git repo.
+
 ### EKS Pipeline Stages
  
 Because there's no Docker daemon available inside EKS pods, the pipeline uses **Kaniko** to build and push images directly to ECR:
