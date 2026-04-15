@@ -30,3 +30,16 @@ resource "aws_ecr_lifecycle_policy" "visual_dictionary" {
     }]
   })
 }
+
+resource "aws_ecr_repository" "jenkins" {
+  name                 = "jenkins-custom"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Project = "ci-cd-terraform-lab"
+  }
+}

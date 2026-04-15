@@ -23,7 +23,7 @@ resource "kubernetes_deployment" "jenkins" {
       spec {
         container {
           name  = "jenkins"
-          image = "jenkins/jenkins:lts"
+          image = "397845934685.dkr.ecr.us-east-2.amazonaws.com/jenkins-custom:latest"
 
           port {
             container_port = 8080
@@ -45,32 +45,5 @@ resource "kubernetes_deployment" "jenkins" {
         }
       }
     }
-  }
-}
-
-resource "kubernetes_service" "jenkins" {
-  metadata {
-    name      = "jenkins"
-    namespace = "visual-dictionary"
-  }
-
-  spec {
-    selector = {
-      app = "jenkins"
-    }
-
-    port {
-      name        = "http"
-      port        = 8080
-      target_port = 8080
-    }
-
-    port {
-      name        = "agent"
-      port        = 50000
-      target_port = 50000
-    }
-
-    type = "LoadBalancer"
   }
 }

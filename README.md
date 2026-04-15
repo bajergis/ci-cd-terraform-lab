@@ -84,4 +84,4 @@ See the aws/ folder for Terraform configuration to deploy on EKS.
 ## Jenkins Credentials
 
 Add the following in Jenkins before running the pipeline:
-- ID: unsplash-api-key — your Unsplash API key (Secret text)
+- ID: unsplash-api-key — your Unsplash API key (Secret text)trigger webhook test
