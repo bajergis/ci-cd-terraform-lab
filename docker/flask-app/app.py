@@ -1,35 +1,33 @@
 import os
+import json
+import redis
 import requests
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from database import db, init_db
 from models import Word
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///dictionary.db"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+redis_client = redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379"))
 
+DATABASE_URL = (
+    f"postgresql://{os.environ.get('POSTGRES_USER')}"
+    f":{os.environ.get('POSTGRES_PASSWORD')}"
+    f"@{os.environ.get('POSTGRES_HOST')}"
+    f":{os.environ.get('POSTGRES_PORT')}"
+    f"/{os.environ.get('POSTGRES_DB')}"
+)
+
+app = Flask(__name__)
+app.url_map.strict_slashes = False
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+CORS(app)
 init_db(app)
 
 UNSPLASH_ACCESS_KEY = os.environ.get('UNSPLASH_ACCESS_KEY')
-
-# ------- Page Routes -------
-
-@app.route("/")
-def index():
-    words = Word.query.order_by(Word.created_at.desc()).all()
-    return render_template("index.html", words=words)
-
-@app.route("/add")
-def add():
-    return render_template("add.html")
-
-@app.route("/words/<string:word>")
-def word_detail(word):
-    entry = Word.query.filter_by(word=word.lower()).first_or_404()
-    return render_template("word.html", entry=entry)
 
 # ------- API Routes -------
 
@@ -72,30 +70,38 @@ def delete_word(word):
 
 @app.route("/api/search-images", methods=["POST"])
 def search_images():
-    data = request.get_json()
-    query = data.get("query", "")
+    query = request.json.get("query", "").strip().lower()
     if not query:
-        return jsonify({"error": "No search query provided"}), 400
+        return jsonify({"error": "query required"}), 400
 
+    cache_key = f"unsplash_{query}"
+
+    # check cache first
+    cached = redis_client.get(cache_key)
+    if cached:
+        return jsonify(json.loads(cached))
+
+    # cache miss - call Unsplash
+    unsplash_access_key = os.environ.get("UNSPLASH_ACCESS_KEY")
     response = requests.get(
-        "https://api.unsplash.com/search/photos",
-        params={"query": query, "per_page": 9, "orientation": "landscape"},
-        headers={"Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}"}
+        'https://api.unsplash.com/search/photos',
+        params={'query': query, 'per_page': 9},
+        headers={'Authorization': f'Client-ID {unsplash_access_key}'}
     )
+    data = response.json()
 
-    if response.status_code != 200:
-        return jsonify({"error": f"Error getting results"}), 500
-
-    results = response.json()
     images = [
         {
-            "url": photo["urls"]["regular"],
-            "thumb": photo["urls"]["small"],
-            "credit": f"Photo by {photo['user']['name'],} on Unsplash"
+            'url':    photo['urls']['small'],
+            'credit': photo['user']['name']
         }
-        for photo in results["results"]
+        for photo in data.get('results', [])
     ]
-    return jsonify({"images": images})
+    result = {'images': images}
+
+    # write cache with 1 hour TTL
+    redis_client.setex(cache_key, 3600, json.dumps(result))
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -43,3 +43,13 @@ resource "aws_ecr_repository" "jenkins" {
     Project = "ci-cd-terraform-lab"
   }
 }
+
+resource "aws_ecr_repository" "react_app" {
+  name                 = "visual-dictionary-react"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+}
+
+output "react_ecr_url" {
+  value = aws_ecr_repository.react_app.repository_url
+}

@@ -15,3 +15,8 @@ variable "unsplash_access_key" {
   type        = string
   sensitive   = true
 }
+
+variable "postgres_password" {
+  description = "PostgreSQL password"
+  sensitive   = true
+}

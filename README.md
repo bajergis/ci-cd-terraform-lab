@@ -182,6 +182,13 @@ docker build --platform linux/amd64 \
   -t 397845934685.dkr.ecr.us-east-2.amazonaws.com/jenkins-custom:latest \
   aws/jenkins/
 docker push 397845934685.dkr.ecr.us-east-2.amazonaws.com/jenkins-custom:latest
+
+cd react-app
+docker build --platform linux/amd64 -t visual-dictionary-react .
+docker tag visual-dictionary-react:latest \
+    397845934685.dkr.ecr.us-east-2.amazonaws.com/visual-dictionary-react:latest
+docker push \
+    397845934685.dkr.ecr.us-east-2.amazonaws.com/visual-dictionary-react:latest
 ```
  
 **Step 3 — Uncomment the k8s module and apply again:**
@@ -247,11 +254,12 @@ cat ~/.aws/credentials
 ```
 Then add them in Jenkins under Manage Jenkins -> Credentials -> System -> Global
 
-| Credential ID | Type | Description |
-|---------------|------|-------------|
-| `aws-access-key-id` | Secret text | AWS access key for ECR/EKS access |
-| `aws-secret-access-key` | Secret text | AWS secret key |
-| `unsplash-api-key` | Secret text | Unsplash API key |
+| Credential ID           | Type | Description                       |
+|-------------------------|------|-----------------------------------|
+| `aws-access-key-id`     | Secret text | AWS access key for ECR/EKS access |
+| `aws-secret-access-key` | Secret text | AWS secret key                    |
+| `unsplash-api-key`      | Secret text | Unsplash API key                  |
+| `postgres-password`     | Secret text | PostgreSQL password               |
  
 Then create a new Job in Jenkins where you add your git repo.
 

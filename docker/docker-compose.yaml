@@ -1,4 +1,23 @@
 services:
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vdict
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: visual_dictionary
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ci-cd-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vdict -d visual_dictionary"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   flask-app:
     build:
       context: ./flask-app
@@ -7,13 +26,21 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY}
+      UNSPLASH_ACCESS_KEY: ${UNSPLASH_ACCESS_KEY}
+      POSTGRES_HOST: postgres #Docker Compose service name = hostname
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: visual_dictionary
+      POSTGRES_USER: vdict
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - flask-data:/app/instance
     env_file:
       - .env
     networks:
       - ci-cd-network
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   jenkins:
     build:
@@ -33,6 +60,7 @@ services:
 volumes:
   flask-data:
   jenkins-data:
+  postgres-data:
 
 networks:
   ci-cd-network:
