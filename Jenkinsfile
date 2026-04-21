@@ -209,6 +209,13 @@ EOF
                             job/pytest-$BUILD_NUMBER \
                             -n visual-dictionary \
                             --timeout=300s
+                        kubectl wait --for=condition=failed \
+                            job/pytest-$BUILD_NUMBER \
+                            -n visual-dictionary \
+                            --timeout=10s && \
+                        kubectl logs job/pytest-$BUILD_NUMBER \
+                            -n visual-dictionary && \
+                        exit 1
                     '''
                 }
             }

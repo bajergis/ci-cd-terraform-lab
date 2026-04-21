@@ -19,13 +19,14 @@ def client():
         db.session.remove()
         db.drop_all()
 
-def test_homepage_loads(client):
-    res = client.get("/")
+def test_get_words_returns_list(client):
+    res = client.get("/api/words")
     assert res.status_code == 200
+    assert isinstance(res.get_json(), list)
 
-def test_add_page_loads(client):
-    res = client.get("/add")
-    assert res.status_code == 200
+def test_word_not_found_returns_404(client):
+    res = client.get("/api/words/nonexistentword")
+    assert res.status_code == 404
 
 def test_create_and_get_word(client):
     res = client.post("/api/words", json={
