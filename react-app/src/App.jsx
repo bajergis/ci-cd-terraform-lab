@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import WordList from './components/WordList'
 import WordDetail from './components/WordDetail'
 import AddWord from './components/AddWord'
+import React from 'react'
 
 export default function App() {
   return (

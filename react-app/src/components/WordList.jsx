@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import WordCard from './WordCard'
+import React from 'react'
 
 export default function WordList() {
   const [words, setWords]     = useState([])

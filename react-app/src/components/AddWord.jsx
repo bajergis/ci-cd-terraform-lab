@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ImageSearch from './ImageSearch'
+import React from 'react'
 
 export default function AddWord() {
   const navigate = useNavigate()

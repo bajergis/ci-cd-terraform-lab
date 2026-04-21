@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import React from 'react'
 
 export default function WordDetail() {
   const { word }        = useParams()   // pulls :word from the URL
