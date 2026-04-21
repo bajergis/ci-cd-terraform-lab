@@ -138,7 +138,7 @@ spec:
         emptyDir: {}
 EOF
 
-                        # --- Wait for both jobs to complete ---
+                        # --- Wait for both builds ---
                         kubectl wait --for=condition=complete \
                             job/kaniko-flask-$BUILD_NUMBER \
                             -n visual-dictionary \
@@ -199,8 +199,8 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: postgres-secret
-                key: POSTGRES_PASSWORD
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
         - name: REDIS_URL
           value: "redis://redis-service:6379"
 EOF
@@ -234,12 +234,16 @@ EOF
                         export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
                         export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
+                        echo "ECR_REPO_FLASK=$ECR_REPO_FLASK"
+                        echo "ECR_REPO_REACT=$ECR_REPO_REACT"
+                        echo "IMAGE_TAG=$IMAGE_TAG"
+
                         aws eks update-kubeconfig \
                             --region $AWS_REGION \
                             --name $CLUSTER_NAME
 
                         kubectl set image deployment/visual-dictionary \
-                            visual-dictionary=$ECR_REPO:$IMAGE_TAG \
+                            visual-dictionary=$ECR_REPO_FLASK:$IMAGE_TAG \
                             -n visual-dictionary
 
                         kubectl rollout status deployment/visual-dictionary \
