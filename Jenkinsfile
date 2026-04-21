@@ -230,28 +230,28 @@ EOF
                     string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
-                    sh """
-                        export AWS_ACCESS_KEY_ID=\$AWS_ACCESS_KEY_ID
-                        export AWS_SECRET_ACCESS_KEY=\$AWS_SECRET_ACCESS_KEY
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
                         aws eks update-kubeconfig \
-                            --region ${AWS_REGION} \
-                            --name ${CLUSTER_NAME}
+                            --region $AWS_REGION \
+                            --name $CLUSTER_NAME
 
                         kubectl set image deployment/visual-dictionary \
-                            visual-dictionary=${ECR_REPO}:${IMAGE_TAG} \
+                            visual-dictionary=$ECR_REPO:$IMAGE_TAG \
                             -n visual-dictionary
 
                         kubectl rollout status deployment/visual-dictionary \
                             -n visual-dictionary
 
                         kubectl set image deployment/visual-dictionary-react \
-                            visual-dictionary-react=${ECR_REPO_REACT}:${IMAGE_TAG} \
+                            visual-dictionary-react=$ECR_REPO_REACT:$IMAGE_TAG \
                             -n visual-dictionary
 
                         kubectl rollout status deployment/visual-dictionary-react \
                             -n visual-dictionary
-                    """
+                    '''
                 }
             }
         }
