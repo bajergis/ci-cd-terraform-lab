@@ -71,7 +71,6 @@ spec:
         args:
         - --context=/workspace/docker/flask-app
         - --dockerfile=/workspace/docker/flask-app/Dockerfile
-        - --no-cache
         - --destination=$ECR_REPO_FLASK:$IMAGE_TAG
         - --destination=$ECR_REPO_FLASK:latest
         volumeMounts:
