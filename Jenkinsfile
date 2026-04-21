@@ -197,7 +197,10 @@ spec:
         - name: POSTGRES_USER
           value: "vdict"
         - name: POSTGRES_PASSWORD
-          value: "test"
+          valueFrom:
+            secretKeyRef:
+                name: postgres-secret
+                key: POSTGRES_PASSWORD
         - name: REDIS_URL
           value: "redis://redis-service:6379"
 EOF
